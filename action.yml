@@ -1,0 +1,88 @@
+name: CI Guard
+description: Run tests with evidence-based dependency retries and a shared coordinator allowance.
+author: CI Guard
+branding:
+  icon: shield
+  color: green
+
+inputs:
+  server:
+    description: CI Guard coordinator URL reachable from this runner.
+    required: true
+  repository:
+    description: Repository policy identity (owner/name).
+    default: ${{ github.repository }}
+  dependency:
+    description: Dependency ID already registered with the coordinator.
+    required: true
+  command:
+    description: Test command with shell-style argument quoting. Shell expansions and pipelines are not evaluated.
+    required: true
+  token:
+    description: Coordinator team token, supplied from a GitHub secret.
+    required: false
+    default: ''
+  job-id:
+    description: Job identifier within this workflow.
+    default: ${{ github.job }}
+  workflow-run-id:
+    description: GitHub workflow run identifier.
+    default: ${{ github.run_id }}
+  report:
+    description: JSON report path relative to the consuming workflow working directory.
+    default: ci-guard-report.json
+  timeout:
+    description: Maximum seconds per test-command attempt.
+    default: '120'
+  python-version:
+    description: Python version used to install and run the wrapper.
+    default: '3.12'
+
+outputs:
+  status:
+    description: passed, failed, blocked, error, or cancelled. Passed verifies direct pytest outcomes or a generic command's zero exit.
+    value: ${{ steps.guard.outputs.status }}
+  run-id:
+    description: Coordinator run identifier, if registration succeeded.
+    value: ${{ steps.guard.outputs.run-id }}
+  report:
+    description: JSON report path.
+    value: ${{ steps.guard.outputs.report }}
+  exit-code:
+    description: Runner exit code. Blocked is 2 and always fails this action.
+    value: ${{ steps.guard.outputs.exit-code }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install CI Guard runner
+      shell: bash
+      env:
+        CI_GUARD_ACTION_PATH: ${{ github.action_path }}
+      run: python -m pip install --disable-pip-version-check "$CI_GUARD_ACTION_PATH/runner"
+    - name: Run guarded tests
+      id: guard
+      shell: bash
+      env:
+        CI_GUARD_SERVER: ${{ inputs.server }}
+        CI_GUARD_REPOSITORY: ${{ inputs.repository }}
+        CI_GUARD_DEPENDENCY: ${{ inputs.dependency }}
+        CI_GUARD_COMMAND: ${{ inputs.command }}
+        CI_GUARD_TOKEN: ${{ inputs.token }}
+        CI_GUARD_JOB_ID: ${{ inputs.job-id }}
+        CI_GUARD_WORKFLOW_RUN_ID: ${{ inputs.workflow-run-id }}
+        CI_GUARD_REPORT: ${{ inputs.report }}
+        CI_GUARD_TIMEOUT: ${{ inputs.timeout }}
+      run: |
+        python -m ci_guard_runner run \
+          --server "$CI_GUARD_SERVER" \
+          --repository "$CI_GUARD_REPOSITORY" \
+          --dependency "$CI_GUARD_DEPENDENCY" \
+          --job-id "$CI_GUARD_JOB_ID" \
+          --workflow-run-id "$CI_GUARD_WORKFLOW_RUN_ID" \
+          --report "$CI_GUARD_REPORT" \
+          --timeout "$CI_GUARD_TIMEOUT" \
+          --command-string "$CI_GUARD_COMMAND"

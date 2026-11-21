@@ -1,0 +1,69 @@
+name: ci-guard
+x-flagsmith-env: &flagsmith-env
+  DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:?Run scripts/prepare_env.py}@postgres:5432/flagsmith
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Run scripts/prepare_env.py}
+  DJANGO_ALLOWED_HOSTS: '*'
+  FLAGSMITH_DOMAIN: localhost:${FLAGSMITH_PORT:-8000}
+  FLAGSMITH_PUBLIC_URL: http://localhost:${FLAGSMITH_PORT:-8000}
+  ENVIRONMENT: production
+  USE_POSTGRES_FOR_ANALYTICS: 'true'
+  TASK_RUN_METHOD: SYNCHRONOUSLY
+  FLAGSMITH_ADMIN_EMAIL: ${FLAGSMITH_ADMIN_EMAIL}
+  FLAGSMITH_ADMIN_PASSWORD: ${FLAGSMITH_ADMIN_PASSWORD}
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: flagsmith
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: [flagsmith-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U postgres -d flagsmith']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith@sha256:80585eef57595d63e60a1f700e994496c8de63bf44f381cb6d3b4f4036ddf792
+    environment: *flagsmith-env
+    ports: ['127.0.0.1:${FLAGSMITH_PORT:-8000}:8000']
+    depends_on:
+      postgres: {condition: service_healthy}
+    volumes:
+      - ./.local:/bootstrap
+      - ./infra/bootstrap_flagsmith.py:/bootstrap_flagsmith.py:ro
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+  guard:
+    build: .
+    env_file: [.local/runtime.env, .local/flagsmith.env]
+    environment:
+      CI_GUARD_DATABASE_PATH: /data/ci-guard.sqlite3
+      CI_GUARD_DEMO_MODE: ${CI_GUARD_DEMO_MODE:-false}
+      FLAGSMITH_API_URL: http://flagsmith:8000/api/v1/
+      NO_PROXY: ${NO_PROXY:-localhost,127.0.0.1},flagsmith,inventory
+      no_proxy: ${no_proxy:-localhost,127.0.0.1},flagsmith,inventory
+      CI_GUARD_DEMO_INVENTORY_URL: http://inventory:8090
+      CI_GUARD_GITHUB_CLIENT_ID: ${CI_GUARD_GITHUB_CLIENT_ID:-}
+      CI_GUARD_GITHUB_APP_SLUG: ${CI_GUARD_GITHUB_APP_SLUG:-}
+      CI_GUARD_GITHUB_TOKEN: ${CI_GUARD_GITHUB_TOKEN:-}
+    ports: ['127.0.0.1:${CI_GUARD_PORT:-8080}:8080']
+    volumes: [guard-data:/data]
+    depends_on:
+      flagsmith: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8080/api/health', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  inventory:
+    image: ci-guard-guard
+    build: .
+    command: [python, examples/inventory_service.py, --host, 0.0.0.0, --port, '8090']
+    profiles: [demo]
+volumes:
+  flagsmith-data:
+  guard-data:

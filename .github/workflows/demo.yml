@@ -1,0 +1,77 @@
+name: CI Guard live repository demonstration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  controlled-demo:
+    name: Controlled outage and pinned StreamPulse tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check out the reviewed consumer revision
+        uses: actions/checkout@v4
+        with:
+          repository: ayushmanthehero-lab/StreamPulse
+          ref: 5af46b946bdf453b8cf2e978d3310f51abc7e2f9
+          path: .local/consumer
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Prepare isolated consumer Python environment
+        run: |
+          python -m venv .local/consumer-venv
+          .local/consumer-venv/bin/python -m pip install --disable-pip-version-check --only-binary=:all: numpy==2.4.4 scipy==1.17.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare isolated self-hosted Flagsmith and CI Guard
+        run: ./scripts/setup.sh
+      - name: Verify controlled outage and the actual consumer suite
+        shell: bash
+        run: |
+          .venv/bin/python examples/inventory_service.py > /tmp/inventory.log 2>&1 &
+          inventory_pid=$!
+          GITHUB_STEP_SUMMARY= GITHUB_OUTPUT= CI_GUARD_DEMO_MODE=true .venv/bin/python scripts/serve.py > /tmp/guard.log 2>&1 &
+          guard_pid=$!
+          trap 'kill "$guard_pid" "$inventory_pid" 2>/dev/null || true' EXIT
+          .venv/bin/python - <<'PY'
+          import time, urllib.request
+          for attempt in range(60):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:8080/api/ready', timeout=2) as response:
+                      assert response.status == 200
+                  break
+              except Exception:
+                  if attempt == 59:
+                      raise
+                  time.sleep(1)
+          PY
+          .venv/bin/python scripts/verify_demo.py
+          .venv/bin/python scripts/verify_consumer.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: controlled-demo-evidence
+          path: |
+            .local/verification-demo.json
+            .local/reports/**/*.json
+          include-hidden-files: true
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: streampulse-consumer-evidence
+          path: |
+            .local/verification-consumer.json
+            .local/ci-guard-report-consumer.json
+          include-hidden-files: true
+          if-no-files-found: warn
+      - name: Stop demonstration services
+        if: always()
+        run: docker compose --env-file .local/runtime.env down
