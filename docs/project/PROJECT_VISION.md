@@ -28,3 +28,7 @@ A complete, usable single-organization self-hosted release, not an enterprise Sa
 6. Every UI action works or explicitly describes unavailable configuration. No invented production metrics.
 7. Docker startup, a real Flagsmith evaluation, local end-to-end demo, concurrency tests, UI build, and browser workflows are verified and reported separately.
 8. Setup instructions explain required GitHub checks and never configure skipped jobs as the test gate.
+
+## GitHub project extension
+
+The user's later request adds real account connection, repository selection, and a three-minute recorded demonstration. They explicitly chose one shared team workspace with multiple repositories. The extension adds administrator-managed GitHub App/device or scoped-token connections, encrypted account credentials, repository-scoped runner tokens, actual GitHub workflow views/dispatch, and a successful remote demonstration using a pinned StreamPulse test suite. It does not introduce public multi-tenant signup. [Design](../superpowers/specs/2026-11-21-github-projects-design.md) and [actual GitHub evidence](../GITHUB_VERIFICATION.md) document this extension.

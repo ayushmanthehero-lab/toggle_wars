@@ -5,6 +5,8 @@ CI Guard supports one organization, one coordinator replica, and SQLite on local
 
 CI_GUARD_TOKEN is the runner credential. CI_GUARD_ADMIN_TOKEN controls dependency and policy administration. The administrator token must not be installed in GitHub workflows. Both are generated privately. In production require HTTPS, restrict network access, and rotate tokens if exposed. Browser tokens stay in session storage until sign-out/clear; do not use the administrator dashboard on an untrusted device. Demo mode bypasses authentication and is only appropriate on loopback/private demo networks.
 
+The GitHub extension adds administrator-managed connections and repository-scoped runner tokens. GitHub administration always requires the administrator token. Once a real GitHub connection has been created, anonymous demo access is permanently disabled, including after disconnecting, so project history remains private. New project integrations should use a scoped token from Projects rather than the legacy workspace-wide `CI_GUARD_TOKEN`. See [GitHub setup](GITHUB.md).
+
 Flagsmith management credentials stay in the coordinator. The SDK environment key, management key and dashboard login are different credentials. FLAGSMITH_ENVIRONMENT_ID refers to the environment API key used by the management URL, not the numeric database row ID. A policy save updates four separate Flagsmith values; if interrupted, the UI reports an uncertain/partial write and requires a reload. There is no distributed transaction spanning those writes.
 
 ## Dependency configuration

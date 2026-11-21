@@ -18,12 +18,14 @@
 
 ## Tasks
 
-- [ ] GitHub service: write failing authorization/credential/device/repository/dispatch tests; implement `server/ci_guard/github.py` and routes, encrypted persistence, bounded GitHub client; run new and existing backend tests.
-- [ ] Project authentication: write failing repository/dependency/run ownership and token rotation tests; extend existing application authentication with project-scoped tokens; verify shared retry accounting remains unchanged.
-- [ ] Dashboard: add `web/src/components/Projects.tsx`, API/types and navigation; implement real connection/repository/project/workflow controls and setup states; build and exercise meaningful flows.
-- [ ] Demonstration workflow: extend isolated demo to run pinned StreamPulse tests; verify locally, inspect final source for secrets, commit/push to empty owned repository, dispatch once, inspect actual run and artifacts.
-- [ ] Integration/review: exercise the actual environment credential connection, select available repositories, verify real GitHub workflow results, run full Python/UI checks and independent security review.
-- [ ] Video: record live browser interactions with captions and sanitized actual GitHub evidence; assemble a three-minute MP4, verify playback/duration and deliver links.
+- [x] GitHub service: write failing authorization/credential/device/repository/dispatch tests; implement `server/ci_guard/github.py` and routes, encrypted persistence, bounded GitHub client; run new and existing backend tests.
+- [x] Project authentication: write failing repository/dependency/run ownership and token rotation tests; extend existing application authentication with project-scoped tokens; verify shared retry accounting remains unchanged.
+- [x] Dashboard: add `web/src/components/Projects.tsx`, API/types and navigation; implement real connection/repository/project/workflow controls and setup states; build and exercise meaningful flows.
+- [x] Demonstration workflow: extend isolated demo to run pinned StreamPulse tests; verify locally, inspect final source for secrets, commit/push to empty owned repository, dispatch once, inspect actual run and artifacts.
+- [x] Integration/review: exercise the actual environment credential connection, select available repositories, verify real GitHub workflow results, run full Python/UI checks and independent security review.
+- [x] Video: record live browser interactions with captions and sanitized actual GitHub evidence; assemble a three-minute MP4, verify playback/duration and deliver links.
+
+Evidence: `docs/GITHUB_VERIFICATION.md` and `docs/DEMO_VIDEO.md`. Live GitHub App device authorization remains a deployment setup step because no app is registered yet; the user requested instructions and the actual demonstration used explicit server-provided GitHub access.
 
 ## Ownership
 

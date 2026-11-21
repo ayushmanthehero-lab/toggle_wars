@@ -1,6 +1,7 @@
 .git
 .venv
 .local
+artifacts
 **/node_modules
 **/dist
 **/build

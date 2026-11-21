@@ -1830,7 +1830,7 @@ function SettingsPage({
       active = false;
     };
   }, [settings]);
-  const install = `# .github/workflows/tests.yml\nname: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@<commit-sha>\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_TOKEN }}\n          dependency: inventory-api\n          command: python -m pytest tests/integration\n# Require the "protected-tests" job in branch protection.\n# Do not add continue-on-error or skip this required check.`;
+  const install = `# .github/workflows/tests.yml\nname: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_TOKEN }}\n          dependency: inventory-api\n          command: python -m pytest tests/integration\n# Require the "protected-tests" job in branch protection.\n# Do not add continue-on-error or skip this required check.`;
   async function connect(e: FormEvent) {
     e.preventDefault();
     setChecking(true);
@@ -1849,7 +1849,7 @@ function SettingsPage({
   async function copy() {
     try {
       await navigator.clipboard.writeText(install);
-      notify("Workflow copied to clipboard. Replace the commit placeholder.");
+      notify("Workflow copied to clipboard. Set your test command and dependency.");
     } catch {
       notify("Clipboard unavailable. Select and copy the workflow text.");
     }

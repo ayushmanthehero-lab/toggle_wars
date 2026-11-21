@@ -88,7 +88,7 @@ The example intentionally failing scenarios are not part of the passing unit sui
 
 Use the dashboard's Projects screen to connect GitHub and prepare repository-specific setup. [GitHub connection instructions](docs/GITHUB.md) cover GitHub App registration, selected repository access, token permissions, and external runner connectivity. One team workspace can connect multiple repositories; this is not a public multi-tenant login service.
 
-After pushing this repository, pin the action to a reviewed commit SHA. Register a dependency in the dashboard before using it. Store the runner token as `CI_GUARD_TOKEN` in GitHub Actions secrets. Keep administrator and Flagsmith credentials on the coordinator only.
+The example below pins the published, verified action commit. Register a dependency in the dashboard before using it. Prefer a project-scoped runner token from Projects; keep administrator and Flagsmith credentials on the coordinator only.
 
 ```yaml
 name: Integration tests
@@ -104,10 +104,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -r requirements.txt
-      - uses: ayushmanthehero-lab/toggle_wars@REPLACE_WITH_REVIEWED_COMMIT_SHA
+      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad
         with:
           server: ${{ vars.CI_GUARD_URL }}
-          token: ${{ secrets.CI_GUARD_TOKEN }}
+          token: ${{ secrets.CI_GUARD_PROJECT_TOKEN }}
           dependency: inventory-api
           command: python -m pytest tests/integration -q
       - uses: actions/upload-artifact@v4
@@ -158,5 +158,7 @@ Direct `pytest` and `python -m pytest` commands use a structured outcome adapter
 - [Operations and security](docs/OPERATIONS.md)
 - [GitHub connections and repository projects](docs/GITHUB.md)
 - [Verification evidence](docs/VERIFICATION.md)
+- [Actual GitHub runs and integration evidence](docs/GITHUB_VERIFICATION.md)
+- [Three-minute recorded walkthrough](docs/DEMO_VIDEO.md)
 
 MIT licensed. Contributions should include a regression test for behavioral changes. Report security concerns privately before disclosing exploitable details.

@@ -1361,7 +1361,7 @@ function ProjectSetupDialog({
       active = false;
     };
   }, []);
-  const snippet = `name: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@<published-commit-sha>\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_PROJECT_TOKEN }}\n          repository: ${project.full_name}\n          dependency: ${selected[0] || "<registered-dependency-id>"}\n          command: python -m pytest tests/integration\n# Require protected-tests in branch protection.\n# Never set continue-on-error or skip this required check.`;
+  const snippet = `name: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_PROJECT_TOKEN }}\n          repository: ${project.full_name}\n          dependency: ${selected[0] || "<registered-dependency-id>"}\n          command: python -m pytest tests/integration\n# Require protected-tests in branch protection.\n# Never set continue-on-error or skip this required check.`;
   async function create() {
     if (!selected.length || !confirmed) return;
     setCreating(true);
@@ -1391,7 +1391,7 @@ function ProjectSetupDialog({
   async function copyWorkflow() {
     try {
       await navigator.clipboard.writeText(snippet);
-      notify("Workflow copied. Replace the published commit and test command.");
+      notify("Workflow copied. Set your test command and dependency.");
     } catch {
       setError(
         "Clipboard access is unavailable. Select and copy the workflow text.",
@@ -1527,8 +1527,7 @@ function ProjectSetupDialog({
             <h3>Add the GitHub Action</h3>
             <p>
               Set the repository variable <code>CI_GUARD_URL</code> to a
-              coordinator URL your runner can reach. Replace the commit
-              placeholder with a published immutable commit.
+              coordinator URL your runner can reach. The Action is pinned to a published, verified commit.
             </p>
           </div>
           <button
