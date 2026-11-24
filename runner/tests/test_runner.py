@@ -21,7 +21,8 @@ RUNNER_ROOT = Path(__file__).resolve().parents[1]
 
 @contextmanager
 def coordinator(*, mode="enforce", initial="run", retry_limit=0, health="unhealthy",
-                fail_attempt=False, fail_probe=False, would_block=False, probe_action="run", patterns=None):
+                fail_attempt=False, fail_probe=False, would_block=False, probe_action="run", patterns=None,
+                probe_delay=0):
     state = {"requests": [], "attempts": [], "finish": None}
     policy = {"mode": mode, "max_job_retries": retry_limit,
               "shared_dependency_retry_budget": retry_limit,
@@ -65,6 +66,8 @@ def coordinator(*, mode="enforce", initial="run", retry_limit=0, health="unhealt
                     run.update(prevented_attempts=1)
                 payload = dict(run)
             elif self.path == "/api/dependencies/inventory/probe":
+                if probe_delay:
+                    time.sleep(probe_delay)
                 if fail_probe:
                     code, payload = 503, {"detail": "Probe unavailable"}
                 elif initial == "probe" and not state["attempts"]:
@@ -134,9 +137,9 @@ def invocation(tmp_path, server, code=None, *, timeout=5, extra=None, env_extra=
     return argv, env, report, summary, outputs
 
 
-def run_command(tmp_path, server, code=None, **kwargs):
+def run_command(tmp_path, server, code=None, *, subprocess_timeout=15, **kwargs):
     argv, env, report, summary, outputs = invocation(tmp_path, server, code, **kwargs)
-    result = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=15)
+    result = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=subprocess_timeout)
     assert report.exists(), f"Runner must write a report on all exits: {result.stderr}"
     return result, json.loads(report.read_text()), summary.read_text(), outputs.read_text()
 
@@ -250,6 +253,19 @@ def test_recovery_probe_passes_owned_lease_before_execution(tmp_path, health, pr
     assert len(report["attempts"]) == (1 if expected_exit == 0 else 0)
     probe = next(r for r in state["requests"] if r[1].endswith("/probe"))
     assert probe[2] == {"run_id": "run-test", "probe_token": "lease-secret", "probe_generation": 7}
+
+
+def test_recovery_probe_can_outlast_the_ordinary_request_timeout(tmp_path):
+    # The coordinator can spend up to ten seconds on the health check alone,
+    # in addition to policy evaluation and coordinator processing.
+    with coordinator(initial="probe", health="healthy", probe_delay=11) as (url, state):
+        result, report, _, _ = run_command(
+            tmp_path, url, "print('checks passed after recovery')", subprocess_timeout=30,
+        )
+    assert result.returncode == 0, report
+    assert report["status"] == "passed"
+    assert report["coordination_error"] is None
+    assert [item["classification"] for item in state["attempts"]] == ["passed"]
 
 
 def test_coordinator_connection_failure_reports_error_without_execution(tmp_path):

@@ -22,7 +22,6 @@
 }
 body {
   margin: 0;
-  min-width: 360px;
   min-height: 100vh;
   background:
     radial-gradient(ellipse at 0% 0%, #eedbc9 0%, transparent 34%),
@@ -2398,9 +2397,6 @@ textarea {
   }
 }
 @media (max-width: 650px) {
-  body {
-    min-width: 360px;
-  }
   .app-shell {
     margin: 8px;
     padding: 12px 12px 0;
@@ -2461,6 +2457,7 @@ textarea {
   .heading-actions {
     width: 100%;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 9px;
   }
   .heading-actions .button {
@@ -2570,6 +2567,7 @@ textarea {
   }
   .outcome-content {
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 18px;
     min-height: 190px;
     padding: 0 0 16px;

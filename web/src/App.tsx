@@ -247,6 +247,7 @@ function RunTable({
 
 export default function App() {
   const [page, setPage] = useState<Page>(getPage);
+  const mainRef = useRef<HTMLElement>(null);
   const [overview, setOverview] = useState<Overview | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true),
@@ -349,7 +350,15 @@ export default function App() {
   const demo = overview?.demo_mode ?? settings?.demo_mode ?? false;
   return (
     <>
-      <a className="skip-link" href="#main">
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(event) => {
+          // The fragment belongs to the route. Move focus without replacing it.
+          event.preventDefault();
+          mainRef.current?.focus();
+        }}
+      >
         Skip to content
       </a>
       <div className="app-shell">
@@ -433,7 +442,7 @@ export default function App() {
               <span className="rail-version">v1</span>
             </div>
           </aside>
-          <main id="main" className="main-content">
+          <main id="main" className="main-content" tabIndex={-1} ref={mainRef}>
             <div className="page-heading">
               <div>
                 <p className="eyebrow">{titles[page].kicker}</p>
