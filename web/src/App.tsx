@@ -55,6 +55,7 @@ import {
 } from "./lib/format";
 import Projects from "./components/Projects";
 import { summarizeDemo } from "./lib/demo";
+import { liveDiagnosticWorkflow, splitCiDocs } from "./lib/liveDiagnostic";
 import { Modal } from "./components/Modal";
 import { TrendChart, OutcomeChart } from "./components/Charts";
 
@@ -1839,7 +1840,7 @@ function SettingsPage({
       active = false;
     };
   }, [settings]);
-  const install = `# .github/workflows/tests.yml\nname: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_TOKEN }}\n          dependency: inventory-api\n          command: python -m pytest tests/integration\n# Require the "protected-tests" job in branch protection.\n# Do not add continue-on-error or skip this required check.`;
+  const install = liveDiagnosticWorkflow("inventory-api");
   async function connect(e: FormEvent) {
     e.preventDefault();
     setChecking(true);
@@ -1858,7 +1859,7 @@ function SettingsPage({
   async function copy() {
     try {
       await navigator.clipboard.writeText(install);
-      notify("Workflow copied to clipboard. Set your test command and dependency.");
+      notify("Diagnostic workflow copied. Set your test command and dependency.");
     } catch {
       notify("Clipboard unavailable. Select and copy the workflow text.");
     }
@@ -1991,7 +1992,7 @@ function SettingsPage({
       <section className="card installation-card" id="installation">
         <CardHeader
           eyebrow="ADD TO YOUR REPOSITORY"
-          title="Your next workflow, protected."
+          title="Run a live diagnostic."
         >
           <button className="button" onClick={copy}>
             <Copy size={16} />
@@ -1999,8 +2000,9 @@ function SettingsPage({
           </button>
         </CardHeader>
         <p className="muted section-description">
-          Register your dependency first. Set the server URL and token in
-          GitHub, then pin the Action to a published commit.
+          Register a dependency and configure its project runner token in
+          GitHub. Run this example manually on a trusted protected ref, not as
+          a merge or release gate.
         </p>
         <pre className="code-block">
           <code>{install}</code>
@@ -2017,8 +2019,12 @@ function SettingsPage({
           <div>
             <span>02</span>
             <p>
-              <strong>Keep the test gate required.</strong> A blocked run must
-              fail the check. It does not mean your tests passed.
+              <strong>Use separate checks.</strong> Require isolated tests for
+              merges and the strict live check for releases. See the{" "}
+              <a href={splitCiDocs} target="_blank" rel="noreferrer">
+                CI Guard README
+              </a>
+              .
             </p>
           </div>
           <div>

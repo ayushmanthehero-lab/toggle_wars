@@ -1,10 +1,10 @@
 # CI Guard
 
-**Stop repeating expensive tests against a confirmed broken dependency.**
+**Keep shared-service outages out of pull-request tests. Verify staging separately before release.**
 
-CI Guard wraps a test command, coordinates a shared retry allowance across jobs, and reports exactly why a run passed, failed, or was blocked. Self-hosted Flagsmith supplies enforcement and retry policies. A React dashboard shows recorded evidence and provides a controlled demonstration.
+CI Guard separates an isolated pull-request test from a live release check. The inventory example boots a fresh dependency for each pull-request job, so it can still test code while staging is down. The live check keeps the existing shared retry allowance, self-hosted Flagsmith policy, and clear pass, fail, or blocked evidence. A React dashboard shows recorded runs and provides a controlled demonstration.
 
-> Blocked tests do not pass. Configure the wrapper's job as a required GitHub check. Never add `continue-on-error` or skip the required test gate.
+> Blocked tests do not pass. Require the secret-free isolated check for pull requests, and gate trusted releases on the separate guarded live smoke. Do not add `continue-on-error` or bypass either gate.
 
 ![CI Guard dashboard](docs/screenshots/overview.png)
 
@@ -88,39 +88,16 @@ The example intentionally failing scenarios are not part of the passing unit sui
 
 Use the dashboard's Projects screen to connect GitHub and prepare repository-specific setup. [GitHub connection instructions](docs/GITHUB.md) cover GitHub App registration, selected repository access, token permissions, and external runner connectivity. One team workspace can connect multiple repositories; this is not a public multi-tenant login service.
 
-The example below pins the published, verified action commit. Register a dependency in the dashboard before using it. Prefer a project-scoped runner token from Projects; keep administrator and Flagsmith credentials on the coordinator only.
+There are two checks with different claims:
 
-```yaml
-name: Integration tests
-on: [push, pull_request]
-jobs:
-  guarded-integration-tests:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -r requirements.txt
-      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad
-        with:
-          server: ${{ vars.CI_GUARD_URL }}
-          token: ${{ secrets.CI_GUARD_PROJECT_TOKEN }}
-          dependency: inventory-api
-          command: python -m pytest tests/integration -q
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ci-guard-report
-          path: ci-guard-report.json
-          if-no-files-found: warn
-```
+| Check | What green demonstrates | What it does not demonstrate |
+|---|---|---|
+| **Isolated inventory / pytest** in `CI Guard checks` | The repository's inventory test really ran and passed against a fresh loopback fixture. No deployed system, CI Guard credential, or Flagsmith is used. | That the independently deployed API, secrets, or live policy work. |
+| **Guarded live inventory / pytest** in the reusable release workflow | The same test passed against a configured staging inventory endpoint through the CI Guard wrapper, with a recorded execution and the expected live Flagsmith policy. | Full API compatibility, production reliability, or that a different consumer/service tested successfully. |
 
-The `guarded-integration-tests` check must be required in branch protection or repository rulesets. An earlier failing step, missing secret, wrapper error, or blocked test remains non-successful. Fork contributions do not receive repository secrets by default; use an isolated coordinator/test setup without production credentials. Never run untrusted pull-request code with privileged `pull_request_target` secrets.
+Run the isolated integration locally: `python scripts/check_isolated_inventory.py --report .local/isolated-inventory.json` after installing `requirements.txt`. The check starts its own fixture; do not point it at a deployed endpoint. **This is an inventory reference implementation:** the live lane needs a staging endpoint with a deterministic `stock: 42` response or an explicitly adapted test. Do not point it at arbitrary production data. For the supported release caller, exact inputs and setup, see [GitHub checks and release smoke](docs/GITHUB.md#github-checks-and-release-smoke).
 
-See [the action contract](action.yml) for exact inputs. The command is split into an argument array; shell operators such as pipes are not evaluated. For complex commands, commit a script and invoke that script explicitly.
+For other integrations, [the composite Action](action.yml) remains available; pin a reviewed commit and register the dependency first. Its command is split into an argument array, not evaluated as shell syntax. Use a checked-in script for commands that need shell operations. A wrapper exit of zero can mean process-exit success for non-pytest commands; the supplied release smoke requires structured pytest evidence as well as live policy.
 
 ## Flagsmith policy
 

@@ -5,10 +5,15 @@ import urllib.error
 import urllib.request
 import pytest
 
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
 def test_inventory_returns_stock():
     endpoint = os.environ.get('INVENTORY_URL', 'http://127.0.0.1:8090') + '/inventory'
     try:
-        with urllib.request.urlopen(endpoint, timeout=3) as response:
+        with urllib.request.build_opener(NoRedirect()).open(endpoint, timeout=3) as response:
             item = json.load(response)
     except (urllib.error.URLError, TimeoutError):
         pytest.fail('INVENTORY_DEPENDENCY_UNAVAILABLE: inventory request failed')

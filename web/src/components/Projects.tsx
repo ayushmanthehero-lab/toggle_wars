@@ -38,6 +38,7 @@ import type {
 } from "../lib/github";
 import type { Dependency } from "../lib/types";
 import { formatDate, relativeTime } from "../lib/format";
+import { liveDiagnosticWorkflow, splitCiDocs } from "../lib/liveDiagnostic";
 
 type Props = {
   revision: number;
@@ -1361,7 +1362,7 @@ function ProjectSetupDialog({
       active = false;
     };
   }, []);
-  const snippet = `name: Protected tests\non: [push, pull_request]\njobs:\n  protected-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n      - run: pip install -r requirements.txt\n      - uses: ayushmanthehero-lab/toggle_wars@227831a35c82082c22a06f91bda546da282715ad\n        with:\n          server: \${{ vars.CI_GUARD_URL }}\n          token: \${{ secrets.CI_GUARD_PROJECT_TOKEN }}\n          repository: ${project.full_name}\n          dependency: ${selected[0] || "<registered-dependency-id>"}\n          command: python -m pytest tests/integration\n# Require protected-tests in branch protection.\n# Never set continue-on-error or skip this required check.`;
+  const snippet = liveDiagnosticWorkflow(selected[0]);
   async function create() {
     if (!selected.length || !confirmed) return;
     setCreating(true);
@@ -1391,7 +1392,7 @@ function ProjectSetupDialog({
   async function copyWorkflow() {
     try {
       await navigator.clipboard.writeText(snippet);
-      notify("Workflow copied. Set your test command and dependency.");
+      notify("Diagnostic workflow copied. Set your test command and dependency.");
     } catch {
       setError(
         "Clipboard access is unavailable. Select and copy the workflow text.",
@@ -1401,7 +1402,7 @@ function ProjectSetupDialog({
   return (
     <Modal
       wide
-      title="Protect this project"
+      title="Set up a live diagnostic"
       description={project.full_name}
       onClose={onClose}
     >
@@ -1524,10 +1525,11 @@ function ProjectSetupDialog({
         <div className="setup-step">
           <span className="setup-number">2</span>
           <div>
-            <h3>Add the GitHub Action</h3>
+            <h3>Add the manual diagnostic</h3>
             <p>
               Set the repository variable <code>CI_GUARD_URL</code> to a
-              coordinator URL your runner can reach. The Action is pinned to a published, verified commit.
+              coordinator URL your runner can reach. Run this example manually
+              on a trusted protected branch or tag.
             </p>
           </div>
           <button
@@ -1544,11 +1546,11 @@ function ProjectSetupDialog({
         <div className="setup-step">
           <span className="setup-number">3</span>
           <div>
-            <h3>Keep the test result required</h3>
+            <h3>Configure separate merge and release checks</h3>
             <p>
-              In GitHub branch protection, require{" "}
-              <strong>protected-tests</strong>. A dependency block must remain a
-              failed check until actual tests run and pass.
+              Importing a project or copying this example does not enable
+              protection. Follow the <GitHubLink url={splitCiDocs}>CI Guard README</GitHubLink>{" "}
+              for the isolated merge check and strict live release check.
             </p>
             <GitHubLink url={`${project.html_url}/settings/secrets/actions`}>
               Open repository secrets

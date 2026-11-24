@@ -2,6 +2,7 @@ name: CI Guard checks
 on:
   push:
   pull_request:
+  merge_group:
 permissions:
   contents: read
 jobs:
@@ -30,3 +31,23 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+  isolated-inventory:
+    name: Isolated inventory / pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Run pytest against an isolated local inventory service
+        run: python scripts/check_isolated_inventory.py --report ci-guard-isolated-inventory-report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-inventory-evidence
+          path: ci-guard-isolated-inventory-report.json
+          if-no-files-found: warn

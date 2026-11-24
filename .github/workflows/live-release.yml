@@ -1,0 +1,74 @@
+name: CI Guard live release check
+on:
+  workflow_call:
+    inputs:
+      coordinator-url:
+        description: Live CI Guard coordinator URL
+        required: true
+        type: string
+      dependency:
+        description: Registered CI Guard dependency ID
+        required: true
+        type: string
+      inventory-url:
+        description: Live inventory service URL
+        required: true
+        type: string
+      expected-mode:
+        description: Required live Flagsmith mode
+        required: false
+        default: enforce
+        type: string
+    secrets:
+      CI_GUARD_PROJECT_TOKEN:
+        description: Project-scoped CI Guard runner token
+        required: true
+permissions:
+  contents: read
+jobs:
+  live-inventory:
+    name: Guarded live inventory / pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Require a trusted release ref before checkout
+        shell: bash
+        env:
+          CALLER_EVENT: ${{ github.event_name }}
+          CALLER_REF_TYPE: ${{ github.ref_type }}
+          CALLER_REF_PROTECTED: ${{ github.ref_protected }}
+        run: |
+          if [[ "$CALLER_EVENT" != push && "$CALLER_EVENT" != workflow_dispatch ]] ||
+             [[ "$CALLER_REF_TYPE" != branch && "$CALLER_REF_TYPE" != tag ]] ||
+             [[ "$CALLER_REF_PROTECTED" != true ]]; then
+            echo "::error::Live check requires a push or manual invocation on a protected branch or tag."
+            exit 1
+          fi
+      # Reusable workflows see the caller's GitHub context. Check exactly the
+      # candidate for the same-repo release caller, not an input branch or SHA.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.txt
+      - name: Require a passing live pytest and verified coordinator report
+        id: live
+        shell: bash
+        env:
+          CI_GUARD_URL: ${{ inputs.coordinator-url }}
+          CI_GUARD_PROJECT_TOKEN: ${{ secrets.CI_GUARD_PROJECT_TOKEN }}
+          CI_GUARD_DEPENDENCY: ${{ inputs.dependency }}
+          CI_GUARD_LIVE_INVENTORY_URL: ${{ inputs.inventory-url }}
+          CI_GUARD_EXPECTED_MODE: ${{ inputs.expected-mode }}
+        run: |
+          python scripts/check_live_inventory.py --report ci-guard-live-inventory-report.json
+          test -s ci-guard-live-inventory-report.json
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.live.outcome != 'skipped'
+        with:
+          name: live-inventory-evidence
+          path: ci-guard-live-inventory-report.json
+          if-no-files-found: error
