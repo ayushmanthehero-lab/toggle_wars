@@ -13,13 +13,17 @@
 <header><a class="brand" href="./" aria-label="CI Guard Demo home"><span class="mark" aria-hidden="true">✓</span> CI Guard</a><span class="event">Toggle Wars <b> / </b> Track 03</span><a class="source" href="https://github.com/ayushmanthehero-lab/toggle_wars/tree/feat/ci-guard-isolated-checks">Source ↗</a></header>
 <main>
 <div class="intro">
-<p class="kicker">FIELD GUIDE 01 <span> / </span> CONTINUOUS INTEGRATION</p>
-<h1>Outage Lab<span>.</span></h1>
-<p class="lead">When a shared service goes down, teams can keep testing without wasting retries. Step through the Parallax demo to see how.</p>
+<p class="kicker">3D OUTAGE LAB <span> / </span> A 60-SECOND WALKTHROUGH</p>
+<h1>Keep testing when<br class="desktop-break"> staging goes down<span>.</span></h1>
+<p class="lead">You submit a code change. GitHub runs its tests before the change can be merged. But if the shared test database is down, even good code can fail. Hitting rerun won’t fix the database.</p>
+<div class="context">
+  <div><b>The app</b><p>Parallax is the app being tested. Its graph check needs a database called FalkorDB.</p></div>
+  <div><b>The fix</b><p>CI Guard stops wasted reruns. A test with its own temporary database can still check your code.</p></div>
+</div>
 </div>
 <div class="switch" aria-label="Simulation scenario">
-<button id="parallax" type="button" aria-pressed="true">01 &nbsp; Parallax outage</button>
-<button id="flags" type="button" aria-pressed="false">02 &nbsp; Flagsmith policy</button>
+<button id="parallax" type="button" aria-pressed="true">01 &nbsp; Follow a code change</button>
+<button id="flags" type="button" aria-pressed="false">02 &nbsp; Compare retry policies</button>
 </div>
 <div class="lab">
 <section class="stage" id="stage" aria-label="3D pipeline diagram">
@@ -33,7 +37,7 @@
 <section class="panel" aria-label="Scenario controls">
 <div id="readout" role="status" aria-live="polite">
 <p class="kicker" id="counter"></p><h2 id="title"></h2><p id="description"></p>
-<div class="metrics"><div><span>OUTCOME</span><strong id="outcome"></strong></div><div><span id="metric-label">TEST ATTEMPTS</span><strong id="attempts"></strong></div></div>
+<div class="metrics"><div><span>OUTCOME</span><strong id="outcome"></strong></div><div><span id="metric-label">TIMES THE TEST RAN</span><strong id="attempts"></strong></div></div>
 </div>
 <div class="controls" id="story-controls">
 <button type="button" id="back">Back</button><button type="button" id="next" class="primary">Take shared DB offline <span aria-hidden="true">→</span></button>
@@ -44,6 +48,7 @@
 </section>
 </div>
 <div class="steps" id="steps" aria-label="Jump to a step"></div>
+<button class="restart" id="restart" type="button" hidden>↺ Replay the Parallax walkthrough</button>
 <aside class="proof">
 <div><p class="kicker">WHAT WAS ACTUALLY TESTED</p><p>This page replays recorded outcomes. It doesn’t run Parallax or change a real Flagsmith flag. The 12 vs. 6 counts came from a separate controlled inventory outage, not from Parallax or a billing estimate.</p></div>
 <div class="links"><a href="https://github.com/ayushmanthehero-lab/toggle_wars/blob/6e9d167a49ba6cba8eb6b76cd9cc2241a7470043/docs/GITHUB_VERIFICATION.md">Flagsmith test record ↗</a><a href="https://github.com/ayushmanthehero-lab/toggle_wars/actions/runs/45354074940">Isolated CI check ↗</a></div>

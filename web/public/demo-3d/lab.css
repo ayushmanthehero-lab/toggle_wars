@@ -66,3 +66,14 @@ h2{font-size:clamp(28px,3.3vw,43px);line-height:1.05;letter-spacing:-.045em;marg
 @media(max-width:760px){.lab{grid-template-columns:1fr}.stage{min-height:275px}.proof{display:block}.links{margin-top:10px}}
 @media(max-width:400px){header{gap:10px}.event{font-size:10px}.stage{min-height:241px}.steps{grid-template-columns:repeat(2,1fr)}}
 @media(prefers-reduced-motion:reduce){.packet{animation:none}.stage[data-state=isolated] .packet{left:79%;top:78%}.stage:is([data-state=blocked],[data-state=enforce]) .packet{left:47%}}
+
+/* Lead with the situation, not the name of the demo. */
+main{padding-top:clamp(25px,3.8vw,52px)}
+h1{font-size:clamp(35px,6.25vw,79px);letter-spacing:-.065em;line-height:1.00}
+.lead{max-width:775px;margin:13px 0 14px}
+.context{display:flex;gap:18px;margin:0 0 18px;max-width:850px}
+.context>div{border-left:2px solid #456186;padding-left:12px;flex:1}
+.context b{display:block;font-size:13px;color:var(--cyan)}
+.context p{font-size:13px;color:var(--dim)}
+.restart{border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:#18263c}
+@media(max-width:600px){.desktop-break{display:none}.context{display:grid;gap:8px}}
