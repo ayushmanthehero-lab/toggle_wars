@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A hands-on CI Guard simulation for Toggle Wars: isolate pull-request tests and stop wasting retries during shared-service outages.">
+<meta name="theme-color" content="#0b1222">
+<title>CI Guard · 3D Outage Lab</title>
+<link rel="stylesheet" href="./lab.css">
+<script type="module" src="./lab.mjs"></script>
+</head>
+<body>
+<header><a class="brand" href="./" aria-label="CI Guard Demo home"><span class="mark" aria-hidden="true">✓</span> CI Guard</a><span class="event">Toggle Wars <b> / </b> Track 03</span><a class="source" href="https://github.com/ayushmanthehero-lab/toggle_wars/tree/feat/ci-guard-isolated-checks">Source ↗</a></header>
+<main>
+<div class="intro">
+<p class="kicker">FIELD GUIDE 01 <span> / </span> CONTINUOUS INTEGRATION</p>
+<h1>Outage Lab<span>.</span></h1>
+<p class="lead">When a shared service goes down, teams can keep testing without wasting retries. Step through the Parallax demo to see how.</p>
+</div>
+<div class="switch" aria-label="Simulation scenario">
+<button id="parallax" type="button" aria-pressed="true">01 &nbsp; Parallax outage</button>
+<button id="flags" type="button" aria-pressed="false">02 &nbsp; Flagsmith policy</button>
+</div>
+<div class="lab">
+<section class="stage" id="stage" aria-label="3D pipeline diagram">
+<div class="scene-top"><span id="scene-title">PARALLAX PIPELINE</span><span class="sim"><i></i> SIMULATION</span></div>
+<div class="world" aria-hidden="true">
+<div class="board"><div class="circuit path-a"></div><div class="circuit path-b"></div><div class="circuit path-c"></div><div class="packet"></div>
+<div class="cube runner"><b>CI</b></div><div class="cube guard"><b>✓</b></div><div class="cube shared"><b>DB</b></div><div class="cube isolated"><b>DB</b></div></div>
+</div>
+<div class="legend" id="legend" aria-hidden="true"></div>
+</section>
+<section class="panel" aria-label="Scenario controls">
+<div id="readout" role="status" aria-live="polite">
+<p class="kicker" id="counter"></p><h2 id="title"></h2><p id="description"></p>
+<div class="metrics"><div><span>OUTCOME</span><strong id="outcome"></strong></div><div><span id="metric-label">TEST ATTEMPTS</span><strong id="attempts"></strong></div></div>
+</div>
+<div class="controls" id="story-controls">
+<button type="button" id="back">Back</button><button type="button" id="next" class="primary">Take shared DB offline <span aria-hidden="true">→</span></button>
+</div>
+<div class="controls" id="policy-controls" hidden>
+<button type="button" id="observe" aria-pressed="true">Observe</button><button type="button" id="enforce" aria-pressed="false">Enforce</button>
+</div>
+</section>
+</div>
+<div class="steps" id="steps" aria-label="Jump to a step"></div>
+<aside class="proof">
+<div><p class="kicker">WHAT WAS ACTUALLY TESTED</p><p>This page replays recorded outcomes. It doesn’t run Parallax or change a real Flagsmith flag. The 12 vs. 6 counts came from a separate controlled inventory outage, not from Parallax or a billing estimate.</p></div>
+<div class="links"><a href="https://github.com/ayushmanthehero-lab/toggle_wars/blob/6e9d167a49ba6cba8eb6b76cd9cc2241a7470043/docs/GITHUB_VERIFICATION.md">Flagsmith test record ↗</a><a href="https://github.com/ayushmanthehero-lab/toggle_wars/actions/runs/45354074940">Isolated CI check ↗</a></div>
+</aside>
+</main>
+</body>
+</html>

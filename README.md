@@ -41,6 +41,10 @@ Open CI Guard at `http://localhost:8080` and Flagsmith at `http://localhost:8000
 
 The default Compose ports bind only to loopback. To use external CI runners, deploy behind an HTTPS reverse proxy on a network reachable from those runners. Do not expose the unauthenticated demo service publicly.
 
+## 3D Outage Lab
+
+Try the [public 3D Outage Lab](https://ci-guard-outage-lab.vercel.app/), or open /demo-3d/ from the dashboard’s Overview. The static simulation replays the Parallax graph-check outcomes and a separate controlled Flagsmith fixture. It never calls the coordinator, GitHub, or any database. Serve web/public/demo-3d as a standalone static site for a public demo without exposing the administrative dashboard.
+
 ## Controlled demo
 
 Run the coordinator and inventory service with explicit demo mode:

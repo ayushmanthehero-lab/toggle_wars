@@ -449,6 +449,9 @@ export default function App() {
                 <p className="eyebrow">{titles[page].kicker}</p>
                 <h1>{titles[page].title}</h1>
                 <p className="page-description">{titles[page].description}</p>
+                {page === "overview" && (
+                  <a href="/demo-3d/">Open the 3D Outage Lab <span aria-hidden="true">↗</span></a>
+                )}
               </div>
               <div className="heading-actions">
                 <button
