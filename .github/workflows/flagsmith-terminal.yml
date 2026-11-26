@@ -1,0 +1,31 @@
+name: CI Guard Flagsmith terminal
+on:
+  push:
+    branches: [feat/ci-guard-flagsmith-terminal]
+    paths:
+      - '.github/workflows/flagsmith-terminal.yml'
+      - 'infra/*terminal*'
+      - 'infra/compose.experiment.yaml'
+      - 'scripts/*terminal*'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  terminal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify the terminal and two isolated CI Guard environments
+        shell: bash
+        run: bash scripts/run_flagsmith_terminal_demo.sh --verify | tee terminal-demo.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: terminal-demo-output
+          path: terminal-demo.txt
