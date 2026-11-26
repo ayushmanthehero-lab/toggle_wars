@@ -6,7 +6,9 @@ after saving. CI Guard's existing web dashboard remains available for runs and g
 
 ## Try it with disposable Flagsmith
 
-On Linux or WSL, install Docker with Compose, curl, and Python 3.12+ with venv:
+For a fresh install, use the [Docker-only quick start](QUICKSTART.md). It works
+from PowerShell without a separate Ubuntu installation. The original Bash
+runner remains available on Linux or WSL with Docker, curl, and Python 3.12+:
 
 ```bash
 ./scripts/run_flagsmith_terminal_demo.sh

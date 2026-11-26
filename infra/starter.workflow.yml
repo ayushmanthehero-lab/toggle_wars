@@ -1,0 +1,81 @@
+# Review before installing as .github/workflows/ci-guard.yml.
+# Create ci/test.sh for your repo. Its default mode must use only isolated test fixtures.
+name: CI Guard starter
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: bash ./ci/test.sh
+  guarded-staging:
+    if: github.event_name == 'workflow_dispatch' && github.ref_type == 'branch' && github.ref_protected
+    runs-on: ubuntu-latest
+    environment: ci-guard-staging
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify staging configuration
+        env:
+          CI_GUARD_URL: ${{ vars.CI_GUARD_URL }}
+          CI_GUARD_DEPENDENCY: ${{ vars.CI_GUARD_DEPENDENCY }}
+          CI_GUARD_EXPECTED_MODE: ${{ vars.CI_GUARD_EXPECTED_MODE }}
+          CI_GUARD_PROJECT_TOKEN: ${{ secrets.CI_GUARD_PROJECT_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from urllib.parse import urlsplit
+          try:
+              value = os.environ["CI_GUARD_URL"]
+              url = urlsplit(value)
+              _ = url.port
+              assert url.scheme == "https" and url.hostname and url.username is None and url.password is None
+              assert not any(c in value for c in "?#\\") and not any(c.isspace() for c in value)
+              assert re.fullmatch(r"cg_proj_[A-Za-z0-9_-]{1,247}", os.environ["CI_GUARD_PROJECT_TOKEN"])
+              assert re.fullmatch(r"[A-Za-z0-9_-]{1,100}", os.environ["CI_GUARD_DEPENDENCY"])
+              assert os.environ["CI_GUARD_EXPECTED_MODE"] in {"observe", "enforce"}
+          except (AssertionError, KeyError, ValueError):
+              raise SystemExit("Invalid CI Guard staging settings; see the Quick Start.")
+          PY
+      - uses: ayushmanthehero-lab/toggle_wars@76bc04e591062012104a30161d2b5a92b0b6699b
+        env:
+          CI_GUARD_LIVE: '1'
+        with:
+          server: ${{ vars.CI_GUARD_URL }}
+          dependency: ${{ vars.CI_GUARD_DEPENDENCY }}
+          token: ${{ secrets.CI_GUARD_PROJECT_TOKEN }}
+          command: bash ./ci/test.sh
+          report: ci-guard-staging-report.json
+      - name: Require a healthy Flagsmith policy and a first-attempt pass
+        env:
+          EXPECTED_MODE: ${{ vars.CI_GUARD_EXPECTED_MODE }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          try:
+              report = json.loads(Path("ci-guard-staging-report.json").read_text())
+              decisions = report["decisions"]
+              def good(policy):
+                  return policy["source"] == "flagsmith" and policy["error"] is None and policy["mode"] == os.environ["EXPECTED_MODE"]
+              assert report["status"] == "passed" and report["exit_code"] == 0
+              assert report["coordination_error"] is None and report["demo"] is False
+              assert good(report["policy"])
+              assert [d["action"] for d in decisions] in (["run", "stop"], ["probe", "run", "stop"])
+              assert all(good(d["policy"]) for d in decisions)
+              attempt, = report["attempts"]
+              assert attempt["exit_code"] == 0 and attempt["classification"] == "passed"
+          except (AssertionError, AttributeError, KeyError, OSError, TypeError, ValueError):
+              raise SystemExit("Staging did not pass with a verified live Flagsmith policy.")
+          print("Staging passed with a verified live Flagsmith policy.")
+          PY

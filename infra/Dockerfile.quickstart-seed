@@ -1,0 +1,2 @@
+FROM docker.flagsmith.com/flagsmith/flagsmith@sha256:48905c664152d8ae2c843ec9cee72ff197e7caff6e91b959bb851a235915ea35
+COPY infra/bootstrap_flagsmith_terminal.py /ci-guard-seed.py

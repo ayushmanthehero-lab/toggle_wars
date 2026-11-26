@@ -11,8 +11,16 @@ from projects.models import Project
 
 path = Path(os.environ.get("CI_GUARD_TERMINAL_CONFIG", "/bootstrap/terminal.env"))
 url = os.environ.get("FLAGSMITH_PUBLIC_URL", "http://127.0.0.1:18000").rstrip("/")
-if url != "http://127.0.0.1:18000" or path.exists():
+quickstart = (
+    os.environ.get("CI_GUARD_QUICKSTART") == "true"
+    and url == "http://127.0.0.1:8000"
+    and path == Path("/bootstrap/terminal.env")
+)
+if not quickstart and (url != "http://127.0.0.1:18000" or path.exists()):
     raise RuntimeError("Only a fresh loopback terminal lab is supported.")
+if quickstart and path.is_file():
+    print("Disposable terminal lab already seeded.")
+    raise SystemExit(0)
 with transaction.atomic():
     organisation = Organisation.objects.create(name="CI Guard Terminal Lab")
     project = Project.objects.create(name="CI Guard Terminal", organisation=organisation)
@@ -47,5 +55,5 @@ fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
 with os.fdopen(fd, "w") as file:
     file.write("".join(f"{name}={value}\n" for name, value in values.items()))
 owner = path.parent.stat()
-os.chown(path, owner.st_uid, owner.st_gid)
+os.chown(path, 10001, 10001) if quickstart else os.chown(path, owner.st_uid, owner.st_gid)
 print("Seeded disposable Flagsmith terminal lab.")

@@ -292,14 +292,14 @@ def show(client, term=""):
     print("RO = read-only. Targeted overrides may produce different results for individual users.")
 
 
-def main():
+def main(argv=None, *, extra_commands=None):
     parser = argparse.ArgumentParser(description="CI Guard terminal dashboard for self-hosted Flagsmith.")
     parser.add_argument("command", choices=("dashboard", "list"), nargs="?", default="dashboard")
     parser.add_argument("--filter", default="", help="Show only flag names containing this text.")
     parser.add_argument("--config", type=Path, default=ROOT / ".local/flagsmith.env", help="Private local config file.")
     parser.add_argument("--write-env", type=int, action="append", default=[], metavar="ID",
                         help="Opt an environment ID in to confirmed edits. May repeat. Production stays locked.")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     client = None
     try:
         config = {}
@@ -317,7 +317,9 @@ def main():
         show(client, args.filter)
         if args.command == "list":
             return 0
-        print("\nEnter: refresh [filter] | set ENV_ID FLAG VALUE | quit")
+        commands = extra_commands or {}
+        usage = "refresh [filter] | set ENV_ID FLAG VALUE | " + "".join(name + " | " for name in commands) + "quit"
+        print(f"\nEnter: {usage}")
         while True:
             try:
                 parts = shlex.split(input("ciguard> "))
@@ -331,8 +333,10 @@ def main():
                     change = client.preview(int(parts[1]), parts[2], parts[3])
                     result = confirm_and_apply(client, change)
                     print(f"Saved and verified in Flagsmith: {result.display(change.name)}" if result else "Cancelled. No write.")
+                elif len(parts) == 1 and parts[0] in commands:
+                    commands[parts[0]]()
                 else:
-                    print("Use refresh [filter], set ENV_ID FLAG VALUE, or quit.")
+                    print(f"Use: {usage}")
             except (TerminalError, ValueError) as exc:
                 print(safe(str(exc)), file=sys.stderr)
     except (EOFError, KeyboardInterrupt):

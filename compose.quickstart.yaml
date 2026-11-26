@@ -1,0 +1,79 @@
+name: ci-guard-quickstart
+
+x-flagsmith-env: &flagsmith-env
+  # Local lab only: no ports, host mounts, external network or real credentials.
+  DATABASE_URL: postgresql://postgres:local-demo-only@postgres:5432/flagsmith
+  DJANGO_SECRET_KEY: ci-guard-disposable-lab-do-not-deploy
+  DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1"
+  FLAGSMITH_DOMAIN: 127.0.0.1:8000
+  FLAGSMITH_PUBLIC_URL: http://127.0.0.1:8000
+  ENVIRONMENT: production
+  ENABLE_TELEMETRY: "false"
+  USE_POSTGRES_FOR_ANALYTICS: "true"
+  TASK_RUN_METHOD: SYNCHRONOUSLY
+x-terminal-build: &terminal-build
+  context: .
+  dockerfile: infra/Dockerfile.quickstart
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: flagsmith
+      POSTGRES_PASSWORD: local-demo-only
+    networks: [lab]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d flagsmith"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith@sha256:48905c664152d8ae2c843ec9cee72ff197e7caff6e91b959bb851a235915ea35
+    environment: *flagsmith-env
+    networks: [lab]
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 3s
+      timeout: 5s
+      retries: 90
+  seed:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.quickstart-seed
+    user: "0:0"
+    entrypoint: [python, manage.py, shell, -c, "exec(compile(open('/ci-guard-seed.py').read(), 'terminal_bootstrap', 'exec'))"]
+    command: []
+    environment:
+      <<: *flagsmith-env
+      CI_GUARD_QUICKSTART: "true"
+    volumes: [fixture:/bootstrap]
+    networks: [lab]
+    depends_on:
+      flagsmith: {condition: service_healthy}
+  terminal:
+    build: *terminal-build
+    entrypoint: [python, scripts/ci_guard_quickstart.py]
+    init: true
+    network_mode: service:flagsmith
+    volumes: [fixture:/bootstrap:ro]
+    depends_on:
+      flagsmith: {condition: service_healthy}
+      seed: {condition: service_completed_successfully}
+    profiles: [terminal]
+  onboard:
+    build: *terminal-build
+    entrypoint: [python, scripts/ci_guard_onboard.py]
+    env_file:
+      - path: .local/onboard.env
+        required: false
+    profiles: [onboard]
+
+networks:
+  lab:
+    internal: true
+volumes:
+  fixture:
+  postgres-data:

@@ -1,0 +1,25 @@
+name: CI Guard Docker Quick Start
+on:
+  push:
+    branches: [feat/ci-guard-quickstart]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  docker-quickstart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate Compose and replay on fresh self-hosted Flagsmith
+        run: |
+          docker compose version
+          docker compose -f compose.quickstart.yaml --profile terminal --profile onboard config --quiet
+          docker compose -f compose.quickstart.yaml run --rm --build -T terminal --verify
+      - name: Verify onboarding entry point without starting the lab again
+        run: docker compose -f compose.quickstart.yaml run --rm --build -T onboard --help
+      - name: Erase the isolated lab
+        if: always()
+        run: docker compose -f compose.quickstart.yaml down -v

@@ -21,18 +21,22 @@ CI Guard separates an isolated pull-request test from a live release check. The 
 
 This is a single-organization self-hosted deployment. Run **one coordinator replica** with SQLite on local persistent disk. See [architecture](docs/superpowers/specs/2026-11-21-ci-guard-design.md) and [operations](docs/OPERATIONS.md) for boundaries.
 
-## Start in the terminal
+## Start in the terminal (Docker only)
 
-```bash
-./scripts/run_flagsmith_terminal_demo.sh
+```sh
+docker compose -f compose.quickstart.yaml run --rm --build terminal
 ```
 
-Compare real Flagsmith environments, switch a single environment's flag, and
-verify the update without leaving the terminal. [Terminal setup and two-environment
-outage replay](docs/FLAGSMITH_TERMINAL.md). The existing web dashboard is still
-available below for graphs, run history, and team settings.
+Run this from the repo root in PowerShell, macOS Terminal, or Linux. The private
+lab starts real self-hosted Flagsmith, compares Development, Staging, and
+Production, and lets you change Staging safely. Try `outage` for actual CI test
+runs and `setup-example` for the onboarding walkthrough. No separate Python,
+Ubuntu installation, Flagsmith account, or paid host is needed.
 
-## Quick start
+[Quick start and bring-your-own-repo setup](docs/QUICKSTART.md) ·
+[Terminal details and safety rules](docs/FLAGSMITH_TERMINAL.md)
+
+## Start the full web dashboard
 
 Requirements: Python 3.12+, Node.js 22+, npm, and Docker with Compose. Linux is the supported runner platform.
 
