@@ -52,6 +52,8 @@ def get_json(client, path, label, **kwargs):
         response = client.get(path, **kwargs)
         if response.status_code in (401, 403):
             raise SetupError(f"{label} denied this repo or token (HTTP {response.status_code}).")
+        if response.status_code == 404 and label == "Coordinator setup check":
+            raise SetupError("Setup endpoint was not found. Check CI_GUARD_URL and use the quick-start branch coordinator.")
         if not response.is_success:
             raise SetupError(f"{label} returned HTTP {response.status_code}. Check its URL and readiness.")
         return response.json()
@@ -76,12 +78,12 @@ def policy_fields(data):
 
 def check_coordinator(client, repository, dependency, selected):
     expected = policy_fields(selected)
-    deps = get_json(client, "api/dependencies", "Coordinator dependency list")
-    if not isinstance(deps, list) or not any(isinstance(d, dict) and d.get("id") == dependency for d in deps):
+    status = get_json(client, "api/setup", "Coordinator setup check",
+                      params={"repository": repository, "dependency": dependency})
+    if not isinstance(status, dict) or status.get("dependency_visible") is not True:
         raise SetupError("Dependency is not visible to this project token. Register it and check the token's allowlist.")
-    current = get_json(client, "api/policy", "Coordinator policy", params={"repository": repository})
-    if policy_fields(current) != expected:
-        raise SetupError("Coordinator policy does not match the selected Flagsmith environment for this repo.")
+    if policy_fields(status.get("policy")) != expected:
+        raise SetupError("Coordinator policy does not match the selected Flagsmith environment defaults.")
     return expected["mode"]
 
 
@@ -98,12 +100,13 @@ def doctor(*, flagsmith_url, flagsmith_token, scheme, project, environment, coor
         terminal.close()
     if selected is None:
         raise SetupError("Environment ID was not found in the selected Flagsmith project. Use the numeric ID from the terminal.")
-    # The environment key is obtained by a Management API GET. Evaluate precisely
-    # the same identity and traits as the coordinator (not just the default flags).
+    if re.search(r"\b(prod|production)\b", selected.name.casefold().replace("_", " ")):
+        raise SetupError("Select a non-production Flagsmith environment for onboarding.")
+    # Evaluate defaults without calling the identity API, which can persist traits.
     provider = PolicyProvider(None)
     provider.api_url = flagsmith_url.rstrip("/") + "/"
     provider.environment_key = selected.key
-    selected_policy = provider.evaluate(repository).model_dump()
+    selected_policy = provider.evaluate().model_dump()
     with httpx.Client(base_url=coordinator_url.rstrip("/") + "/", timeout=8, follow_redirects=False,
                       trust_env=False, headers={"Authorization": f"Bearer {project_token}"}) as client:
         return check_coordinator(client, repository, dependency, selected_policy)

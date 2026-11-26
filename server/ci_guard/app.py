@@ -204,6 +204,20 @@ def create_app(database_path=None):
     def policy(repository: str=Query(default='',max_length=200),role=Depends(authenticate)):
         return provider.evaluate(project_repository(role,repository))
 
+    @app.get('/api/setup')
+    def setup_check(repository: str=Query(min_length=3,max_length=200),
+                    dependency: str=Query(min_length=1,max_length=100),role=Depends(authenticate)):
+        if not isinstance(role,dict):
+            raise HTTPException(403,'Setup requires a project runner token')
+        project_repository(role,repository)
+        if dependency not in role['dependency_ids']:
+            return {'dependency_visible':False,'policy':None}
+        with db.transaction() as con:
+            visible = Database.get(con,'dependencies',dependency) is not None
+        # The SDK identity API may persist traits. Setup compares defaults via
+        # the environment-only read; it must not create/update a repo identity.
+        return {'dependency_visible':visible,'policy':provider.evaluate() if visible else None}
+
     @app.put('/api/policy',dependencies=[Depends(administrator)])
     def update_policy(body: PolicyInput):
         try:

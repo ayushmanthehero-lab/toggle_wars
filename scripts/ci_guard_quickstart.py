@@ -134,7 +134,7 @@ def setup_example(cfg, staging_db):
     print("Onboarding example: local fixture repository only; GitHub was not contacted.")
     print("  PASS  Selected Staging and read its Flagsmith policy")
     print(f"  PASS  Scoped token can see {DEPENDENCY} for {REPO}")
-    print(f"  PASS  Coordinator matches the effective {mode.title()} policy")
+    print(f"  PASS  Coordinator matches the default {mode.title()} policy")
     print(f"  READY  {generated.name} (reviewable starter; nothing was pushed)")
     print("    isolated-pr: pull requests, local fixture, no CI Guard secret")
     print("    guarded-staging: manual dispatch, protected branch, staging secret")

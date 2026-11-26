@@ -17,10 +17,10 @@ def test_doctor_checks_only_get_and_refuses_different_policy():
     def handle(req):
         requests.append((req.method, req.url.path))
         assert req.headers["Authorization"] == "Bearer cg_proj_example"
-        if req.url.path == "/api/policy":
-            assert req.url.params["repository"] == "team/consumer"
-            return httpx.Response(200, json=selected)
-        return httpx.Response(200, json=[{"id": "inventory"}])
+        assert req.url.path == "/api/setup"
+        assert req.url.params["repository"] == "team/consumer"
+        return (httpx.Response(200, json={"dependency_visible": True, "policy": selected}) if req.url.params["dependency"] == "inventory"
+                else httpx.Response(200, json={"dependency_visible": False, "policy": None}))
     with httpx.Client(base_url="https://coord.example", transport=httpx.MockTransport(handle),
                       headers={"Authorization": "Bearer cg_proj_example"}) as client:
         assert m.check_coordinator(client, "team/consumer", "inventory", selected) == "enforce"

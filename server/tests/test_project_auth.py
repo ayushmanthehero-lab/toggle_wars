@@ -211,3 +211,24 @@ def test_readiness_supports_admin_and_project_tokens_without_legacy_runner(tmp_p
     app = importlib.import_module('ci_guard.app').create_app(database_path=str(tmp_path/'admin-only.db'))
     app.state.policy_provider.evaluate = lambda repository: Policy(mode='enforce',source='flagsmith')
     assert TestClient(app).get('/api/ready').status_code==200
+
+
+def test_setup_checks_scope_but_never_evaluates_or_creates_repository_identity(workspace):
+    client, tokens = workspace
+    scopes = headers(tokens["one"])
+    observed = []
+    provider = client.app.state.policy_provider
+    original = provider.evaluate
+    def observed_policy(repository=""):
+        observed.append(repository)
+        return original(repository)
+    provider.evaluate = observed_policy
+    endpoint = "/api/setup"
+    assert client.get(endpoint, params={"repository": "team/one", "dependency": "inventory"}, headers=ADMIN).status_code == 403
+    assert client.get(endpoint, params={"repository": "team/two", "dependency": "inventory"}, headers=scopes).status_code == 403
+    invisible = client.get(endpoint, params={"repository": "team/one", "dependency": "billing"}, headers=scopes)
+    assert invisible.json() == {"dependency_visible": False, "policy": None}
+    matched = client.get(endpoint, params={"repository": "team/one", "dependency": "inventory"}, headers=scopes)
+    assert matched.status_code == 200
+    assert matched.json()["policy"]["mode"] == "observe"
+    assert observed == [""]

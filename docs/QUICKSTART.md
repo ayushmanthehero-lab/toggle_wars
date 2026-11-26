@@ -46,7 +46,7 @@ append `--verify` after `terminal`.
 ## 2. Use it with your own repository
 
 Use a real non-production Flagsmith environment and a CI Guard coordinator
-configured to use that environment's SDK key. A local Docker quick-start
+from this branch, configured to use that environment's SDK key. A local Docker quick-start
 coordinator is intentionally **not** reachable from GitHub-hosted runners.
 See [Operations](OPERATIONS.md) for hosting, [GitHub setup](GITHUB.md) for
 importing your repo and issuing a project token, and the
@@ -76,11 +76,12 @@ CI_GUARD_PROJECT_TOKEN=cg_proj_your-scoped-runner-token
 docker compose -f compose.quickstart.yaml run --rm --build onboard --repo example-org/my-app --environment 42 --dependency inventory
 ```
 
-This checks the selected Flagsmith environment's **effective policy for that
-repository**, whether the scoped token can see the dependency, and whether the
-coordinator reports the same values. Matching values are not proof of exact
+This checks the selected Flagsmith environment's **default policy**, whether the
+scoped token can access the repository and dependency, and whether the
+coordinator reports the same defaults. Matching values are not proof of exact
 environment identity; verify the coordinator SDK key in its deployment
-configuration. The checker uses no remote writes, never executes your tests,
+configuration. Repository-specific targeting is evaluated by the actual
+staging run, not by the read-only setup check. The checker uses no remote writes, never executes your tests,
 and does not prove reachability from a GitHub-hosted runner. If your coordinator
 is private, review the generated job's runner labels for your approved
 self-hosted runner. PR jobs should stay isolated.
