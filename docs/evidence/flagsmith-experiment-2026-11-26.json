@@ -1,0 +1,1546 @@
+{
+  "source": "Flagsmith Experimentation and real CI Guard subprocesses",
+  "traffic": "144 synthetic repository identities; four real pytest jobs per outage batch",
+  "config": {
+    "enrollment_percent": 100,
+    "observe_percent": 50,
+    "enforce_percent": 50
+  },
+  "cohorts": {
+    "observe": {
+      "batches": 74,
+      "attempts": 888,
+      "mean": 12.0
+    },
+    "enforce": {
+      "batches": 70,
+      "attempts": 419,
+      "mean": 5.985714285714286
+    }
+  },
+  "flagsmith_results": {
+    "metrics": [
+      {
+        "variants": {
+          "control": {
+            "n": 74,
+            "sum": 888.0,
+            "sum_squares": 10656.0
+          },
+          "enforce": {
+            "n": 70,
+            "sum": 419.0,
+            "sum_squares": 2509.0
+          }
+        },
+        "inference": {
+          "enforce": {
+            "lift": -0.5011904761904762,
+            "ci_low": -0.5035237666482623,
+            "ci_high": -0.49885718573269017,
+            "chance_to_win": 1.0
+          }
+        },
+        "metric_id": 1,
+        "conversions_timeseries": null
+      }
+    ],
+    "srm_p_value": null,
+    "exposures_timeseries": {
+      "points": [
+        {
+          "bucket": "2026-11-26T10:00:00+00:00",
+          "new_identities": {
+            "control": 74,
+            "enforce": 70
+          }
+        }
+      ],
+      "granularity": "hour"
+    }
+  },
+  "guardrails": {
+    "control-healthy": {
+      "executions": 1,
+      "statuses": [
+        "passed"
+      ]
+    },
+    "control-assertion": {
+      "executions": 1,
+      "statuses": [
+        "failed"
+      ]
+    },
+    "enforce-healthy": {
+      "executions": 1,
+      "statuses": [
+        "passed"
+      ]
+    },
+    "enforce-assertion": {
+      "executions": 1,
+      "statuses": [
+        "failed"
+      ]
+    }
+  },
+  "outcomes": [
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 5,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "enforce",
+      "executions": 6,
+      "statuses": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "variant": "control",
+      "executions": 12,
+      "statuses": [
+        "failed",
+        "failed",
+        "failed",
+        "failed"
+      ]
+    }
+  ],
+  "winner": "enforce",
+  "rollout_verified_in_lab": true,
+  "sample_ratio_p": 0.7388826803635273,
+  "sample_ratio_source": "local_50_50_check",
+  "flagsmith_source_commit": "181a4f6c335055bdca6b6b80e70692f36037a07f",
+  "run_date": "2026-11-26",
+  "runtime": "Flagsmith source and PostgreSQL 17, run on loopback; no production traffic.",
+  "job_outcomes_by_arm": {
+    "control": {
+      "failed": 296
+    },
+    "enforce": {
+      "blocked": 279,
+      "failed": 1
+    }
+  }
+}

@@ -41,6 +41,10 @@ Open CI Guard at `http://localhost:8080` and Flagsmith at `http://localhost:8000
 
 The default Compose ports bind only to loopback. To use external CI runners, deploy behind an HTTPS reverse proxy on a network reachable from those runners. Do not expose the unauthenticated demo service publicly.
 
+## Flagsmith Experimentation
+
+[Run the reproducible Observe vs Enforce experiment](docs/FLAGSMITH_EXPERIMENT.md) on an isolated copy of CI Guard. It uses real CI Guard runner executions and Flagsmith's calculated results, without a paid service or a production policy change.
+
 ## Controlled demo
 
 Run the coordinator and inventory service with explicit demo mode:

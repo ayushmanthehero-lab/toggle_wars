@@ -1,0 +1,36 @@
+# Disposable, loopback-only Flagsmith. No additional warehouse service.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: flagsmith
+      POSTGRES_PASSWORD: ${EXPERIMENT_POSTGRES_PASSWORD:?Use scripts/run_flagsmith_experiment.sh}
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d flagsmith"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith@sha256:48905c664152d8ae2c843ec9cee72ff197e7caff6e91b959bb851a235915ea35
+    environment:
+      DATABASE_URL: postgresql://postgres:${EXPERIMENT_POSTGRES_PASSWORD}@postgres:5432/flagsmith
+      DJANGO_SECRET_KEY: ${EXPERIMENT_DJANGO_SECRET:?Use scripts/run_flagsmith_experiment.sh}
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1"
+      FLAGSMITH_DOMAIN: 127.0.0.1:18000
+      FLAGSMITH_PUBLIC_URL: http://127.0.0.1:18000
+      ENVIRONMENT: production
+      EXPERIMENTATION_ENABLED: "true"
+      ENABLE_TELEMETRY: "false"
+      USE_POSTGRES_FOR_ANALYTICS: "true"
+      TASK_RUN_METHOD: SYNCHRONOUSLY
+    ports: ["127.0.0.1:18000:8000"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    volumes:
+      - ${EXPERIMENT_TEMP:?Use scripts/run_flagsmith_experiment.sh}:/bootstrap
+      - ./bootstrap_flagsmith_experiment.py:/bootstrap_flagsmith_experiment.py:ro
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 3s
+      timeout: 5s
+      retries: 90
